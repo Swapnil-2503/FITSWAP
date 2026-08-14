@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swap Fitness</title>
+<title>SWAP FITNESS</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -351,10 +351,11 @@ header{
 
 .ex-suggestion{
   font-size:11.5px;
+  line-height:1.7;
   color:var(--text-dim);
   background:rgba(232,185,35,0.07);
   border:1px solid var(--accent-dim);
-  padding:7px 10px;
+  padding:8px 10px;
   border-radius:7px;
   margin-bottom:10px;
   font-family:'JetBrains Mono',monospace;
@@ -1030,26 +1031,51 @@ function parseTarget(target){
   return {min:null, max:null};
 }
 
+/* Double progression: the working weight stays fixed across all prescribed
+   sets of an exercise for a given session. Reps are pushed up, set to set
+   and session to session, within the prescribed rep range. Weight only goes
+   up once every prescribed set hits the TOP of the rep range in the same
+   session — never mid-session, never automatically every session. */
 function computeSuggestion(exObj, lastEntry){
   if(!lastEntry || exObj.type!=='wr') return null;
   const {min,max} = parseTarget(exObj.target);
   if(min===null) return null;
-  const validSets = lastEntry.sets.filter(s=>s.w!==undefined);
+  const validSets = lastEntry.sets.filter(s=>s.w!==undefined && s.r!==undefined);
   if(!validSets.length) return null;
   const topWeight = Math.max(...validSets.map(s=>s.w||0));
   if(topWeight===0) return null;
-  const allAtMax = validSets.every(s=>(s.r||0) >= max);
-  const anyBelowMin = validSets.some(s=>(s.r||0) < min);
-  let suggestedWeight = topWeight, note;
-  if(allAtMax){
-    suggestedWeight = Math.round((topWeight+2.5)*2)/2;
-    note = `Hit top of range last time — try ${suggestedWeight} kg`;
-  } else if(anyBelowMin){
-    note = `Below target reps last time — hold at ${topWeight} kg`;
-  } else {
-    note = `In range — repeat ${topWeight} kg, aim for more reps`;
+
+  const reps = validSets.map(s=>s.r||0);
+  const repsStr = reps.join(',');
+  const totalReps = reps.reduce((a,b)=>a+b,0);
+  // Only count it as "top of range on every set" if every prescribed working
+  // set was logged and each one reached (or passed) the top of the range.
+  const hitTopEverySet = reps.length>=exObj.sets && reps.every(r=>r>=max);
+
+  if(hitTopEverySet){
+    const suggestedWeight = Math.round((topWeight+2.5)*2)/2;
+    return {
+      suggestedWeight,
+      increase:true,
+      lines:[
+        `Increase to ${suggestedWeight} kg`,
+        `Previous: ${repsStr}`,
+        `You reached the top of the rep range on every set.`
+      ]
+    };
   }
-  return {suggestedWeight, note};
+
+  const goalStr = Array(exObj.sets).fill(max).join(',');
+  return {
+    suggestedWeight: topWeight,
+    increase:false,
+    lines:[
+      `Keep ${topWeight} kg`,
+      `Previous: ${repsStr}`,
+      `Goal: ${goalStr}`,
+      `Next target: beat ${totalReps} total reps`
+    ]
+  };
 }
 
 /* ---------- Volume / 1RM / PRs ---------- */
@@ -1199,6 +1225,32 @@ function buildSetRow(type, idx, savedSet, lastSet, suggestedWeight){
   return row;
 }
 
+/* Working weight must stay identical across every prescribed set in an
+   exercise. Typing a weight into any set fills the others automatically —
+   but never overwrites a value the person already entered by hand, so
+   manual overrides on individual sets are always possible. */
+function wireWeightSync(setsGrid){
+  setsGrid.querySelectorAll('.w-input').forEach(inp=>{
+    if(inp.dataset.syncWired) return;
+    inp.dataset.syncWired = '1';
+    inp.addEventListener('input', ()=>{
+      if(inp.value===''){
+        // Clearing the first-touched weight doesn't clear siblings —
+        // avoids surprising deletions elsewhere in the exercise.
+        return;
+      }
+      setsGrid.querySelectorAll('.w-input').forEach(other=>{
+        if(other!==inp && other.value===''){ other.value = inp.value; }
+      });
+      renderProgress();
+    });
+  });
+}
+function getSharedWorkingWeight(setsGrid){
+  const filled = Array.from(setsGrid.querySelectorAll('.w-input')).find(i=>i.value!=='');
+  return filled ? Number(filled.value) : undefined;
+}
+
 /* ---------- Rendering a day ---------- */
 async function renderDay(){
   const d = PLAN[currentDay];
@@ -1238,7 +1290,7 @@ async function renderDay(){
         <div class="ex-actions-row">
           <button type="button" class="info-btn">How to</button>
         </div>
-        ${suggestion ? `<div class="ex-suggestion">${suggestion.note}</div>` : ''}
+        ${suggestion ? `<div class="ex-suggestion"><b style="color:${suggestion.increase?'var(--accent)':'var(--text)'}">${suggestion.lines[0]}</b><br>${suggestion.lines.slice(1).join('<br>')}</div>` : ''}
         <div class="sets-grid"></div>
         <button type="button" class="add-set-btn">+ add set</button>
         ${(volume>0 || oneRM) ? `<div class="ex-metrics">
@@ -1254,17 +1306,20 @@ async function renderDay(){
     card.querySelector('.info-btn').onclick = ()=> openInfoModal(exObj);
 
     const setsGrid = card.querySelector('.sets-grid');
+    // Working weight is fixed across all prescribed sets for the session,
+    // so every set row shares the same suggested-weight placeholder.
+    const sw = suggestion ? suggestion.suggestedWeight : undefined;
     for(let i=0;i<exObj.sets;i++){
       const savedSet = todayEntry && todayEntry.sets[i] ? todayEntry.sets[i] : null;
       const lastSet = lastEntry && lastEntry.sets[i] ? lastEntry.sets[i] : null;
-      const sw = (i===0 && suggestion) ? suggestion.suggestedWeight : undefined;
       setsGrid.appendChild(buildSetRow(exObj.type, i, savedSet, lastSet, sw));
     }
     if(todayEntry && todayEntry.sets.length > exObj.sets){
       for(let i=exObj.sets;i<todayEntry.sets.length;i++){
-        setsGrid.appendChild(buildSetRow(exObj.type, i, todayEntry.sets[i], null, undefined));
+        setsGrid.appendChild(buildSetRow(exObj.type, i, todayEntry.sets[i], null, sw));
       }
     }
+    if(exObj.type==='wr') wireWeightSync(setsGrid);
 
     setsGrid.querySelectorAll('.set-done-btn').forEach(btn=>{
       btn.onclick = ()=>{
@@ -1278,7 +1333,10 @@ async function renderDay(){
 
     card.querySelector('.add-set-btn').onclick = ()=>{
       const idx = setsGrid.children.length;
-      const row = buildSetRow(exObj.type, idx, null, null, undefined);
+      // Extra sets added mid-session should default to whatever working
+      // weight is already in use, not a blank field.
+      const existingWeight = exObj.type==='wr' ? getSharedWorkingWeight(setsGrid) : undefined;
+      const row = buildSetRow(exObj.type, idx, null, null, existingWeight!==undefined ? existingWeight : sw);
       setsGrid.appendChild(row);
       row.querySelector('.set-done-btn').onclick = ()=>{
         row.classList.add('completed');
@@ -1286,6 +1344,7 @@ async function renderDay(){
         renderProgress();
         markSessionStart();
       };
+      if(exObj.type==='wr') wireWeightSync(setsGrid);
     };
 
     const chartArea = card.querySelector('.chart-area');
