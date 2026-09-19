@@ -56,7 +56,7 @@ header{
 }
 .brand span{color:var(--accent);}
 
-.header-right{display:flex;align-items:center;gap:8px;}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 
 #logDate{
   background:var(--surface);
@@ -85,7 +85,7 @@ header{
 .panel-row{
   display:flex;
   gap:10px;
-  margin-bottom:18px;
+  margin-bottom:10px;
   flex-wrap:wrap;
 }
 .panel{
@@ -156,6 +156,36 @@ header{
   margin-top:6px;
   font-family:'JetBrains Mono',monospace;
 }
+
+/* --- Recovery check --- */
+.recovery-panel{
+  margin-bottom:18px;
+}
+.rc-stats{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  color:var(--text-dim);
+  margin-bottom:10px;
+}
+.rc-stats b{color:var(--text);}
+.rc-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.rc-item{
+  font-size:12.5px;
+  line-height:1.5;
+  padding:8px 10px;
+  border-radius:7px;
+  border:1px solid var(--border);
+  color:var(--text-dim);
+}
+.rc-item b{color:var(--text);}
+.rc-item.alert{border-color:var(--red);background:rgba(193,83,63,0.09);color:var(--text);}
+.rc-item.warn{border-color:var(--accent-dim);background:rgba(232,185,35,0.07);}
+.rc-item.ok{border-color:var(--green);background:rgba(94,156,110,0.09);}
+.rc-item.info{border-color:var(--blue);background:rgba(79,131,161,0.10);}
+.rc-actions{display:flex;gap:8px;flex-wrap:wrap;}
 
 /* --- Day tabs --- */
 .day-tabs{
@@ -255,6 +285,20 @@ header{
   color:var(--text-faint);
 }
 
+/* --- Day note --- */
+.day-note{
+  font-size:12.5px;
+  line-height:1.55;
+  color:var(--text-dim);
+  background:rgba(232,185,35,0.06);
+  border:1px solid var(--accent-dim);
+  border-radius:var(--radius);
+  padding:10px 12px;
+  margin-bottom:10px;
+}
+.day-note b{color:var(--text);}
+.day-note.deload{border-color:var(--blue);background:rgba(79,131,161,0.10);}
+
 /* --- Exercise cards --- */
 .exercise{
   background:var(--surface);
@@ -277,6 +321,7 @@ header{
 .ex-check.done{background:var(--green);border-color:var(--green);}
 .ex-check.done::after{content:'✓';color:#0d0e10;font-size:14px;font-weight:700;}
 .ex-name{font-size:14.5px;font-weight:500;}
+.warn-dot{color:var(--accent);font-size:12px;margin-left:2px;}
 .ex-target{
   font-family:'JetBrains Mono',monospace;
   font-size:12px;
@@ -348,6 +393,17 @@ header{
   cursor:pointer;
 }
 .info-btn:hover{border-color:var(--accent);}
+
+.ex-build{
+  font-size:11.5px;
+  line-height:1.55;
+  color:var(--text-dim);
+  border-left:3px solid var(--accent);
+  background:rgba(232,185,35,0.05);
+  padding:7px 10px;
+  border-radius:0 7px 7px 0;
+  margin-bottom:10px;
+}
 
 .ex-suggestion{
   font-size:11.5px;
@@ -523,6 +579,8 @@ header{
 .bullet-list li::before{content:'—';position:absolute;left:0;color:var(--text-faint);}
 .mistake-list li::before{content:'✕';color:var(--red);}
 .safety-box{background:rgba(193,83,63,0.08);border:1px solid var(--red);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--text-dim);margin-top:6px;}
+.build-box{background:rgba(232,185,35,0.07);border:1px solid var(--accent-dim);border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:var(--text-dim);margin-top:6px;}
+.build-box b{color:var(--text);}
 
 /* completion modal */
 .completion-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
@@ -557,6 +615,7 @@ header{
     <div class="brand">SWAP <span>FITNESS</span></div>
     <div class="header-right">
       <input type="date" id="logDate">
+      <button class="icon-btn" id="guideBtn">Build notes</button>
       <button class="icon-btn" id="exportBtn">Export CSV</button>
     </div>
   </header>
@@ -575,6 +634,15 @@ header{
       <div class="panel-title">Last 28 Days</div>
       <div class="heatmap" id="heatmap"></div>
       <div class="heatmap-caption" id="heatmapCaption"></div>
+    </div>
+  </div>
+
+  <div class="panel recovery-panel" id="recoveryPanel">
+    <div class="panel-title">Recovery Check</div>
+    <div class="rc-stats" id="rcStats"></div>
+    <ul class="rc-list" id="rcList"></ul>
+    <div class="rc-actions">
+      <button class="icon-btn" id="deloadBtn">Start deload week</button>
     </div>
   </div>
 
@@ -624,6 +692,17 @@ header{
   </div>
 </div>
 
+<!-- Build guide modal -->
+<div class="modal-overlay" id="guideModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Build Notes</div>
+      <button class="modal-close" id="guideModalClose">×</button>
+    </div>
+    <div id="guideModalBody"></div>
+  </div>
+</div>
+
 <!-- Completion modal -->
 <div class="modal-overlay" id="completionModal">
   <div class="modal-box">
@@ -642,8 +721,11 @@ function ex(id, name, target, sets, type, rest, info){
   return {id, name, target, sets, type, rest, info};
 }
 
+/* Weekly layout: Mon Upper, Tue Lower, WED REST, Thu Push, Fri Pull, Sat Legs+Core, Sun REST.
+   The object keys (mon/tue/wed/thu/fri) are internal IDs only — they are kept unchanged so
+   previously saved history still loads. Only the display labels moved. */
 const PLAN = {
-  mon:{label:'Mon', title:'Upper Body (Heavy)', exercises:[
+  mon:{label:'Mon', title:'Upper Body (Heavy)', restBefore:true, exercises:[
     ex('mon_bench','Barbell Bench Press','4×6-8',4,'wr',150,{
       muscles:['Chest','Triceps','Front Delts'],
       setup:'Lie on the bench with eyes under the bar, feet flat, shoulder blades pulled together.',
@@ -669,7 +751,7 @@ const PLAN = {
       perform:'Pull the bar to your upper chest, driving elbows down and back, then control it back up.',
       cues:['Lead with the elbows','Slight lean back, not a big swing','Squeeze lats at the bottom','Avoid using body momentum'],
       mistakes:['Pulling behind the neck','Yanking with the arms only','Not controlling the eccentric']}),
-    ex('mon_latraise','Cable Lateral Raise',3,3,'wr',60,{
+    ex('mon_latraise','Cable Lateral Raise','3×12-15',3,'wr',60,{
       muscles:['Side Delts'],
       setup:'Stand side-on to the cable, handle at hip height, slight bend in the elbow.',
       perform:'Raise the arm out to shoulder height, then lower slowly.',
@@ -727,7 +809,7 @@ const PLAN = {
       cues:['Curl the pelvis, don’t just swing the legs','Avoid using momentum','Exhale as you raise','Control the lowering phase'],
       mistakes:['Swinging the whole body','Using momentum instead of ab strength','Not controlling the descent']}),
   ]},
-  wed:{label:'Wed', title:'Push (Hypertrophy)', exercises:[
+  wed:{label:'Thu', title:'Push (Hypertrophy)', restBefore:true, exercises:[
     ex('wed_incline','Incline Dumbbell Press','3×10-12',3,'wr',120,{
       muscles:['Upper Chest','Front Delts','Triceps'],
       setup:'Bench set to 30-45°, dumbbells at shoulder level.',
@@ -765,7 +847,7 @@ const PLAN = {
       cues:['Squeeze the chest at the peak','Control the stretch on the way back','Keep a slight bend in the elbows','Avoid slamming the pads together'],
       mistakes:['Using momentum to bang the pads together','Shrugging shoulders up','Not controlling the eccentric']}),
   ]},
-  thu:{label:'Thu', title:'Pull (Hypertrophy)', exercises:[
+  thu:{label:'Fri', title:'Pull (Hypertrophy)', exercises:[
     ex('thu_widelatpull','Wide Grip Lat Pulldown','3×10-12',3,'wr',90,{
       muscles:['Lats','Rear Delts','Biceps'],
       setup:'Wide overhand grip, thighs locked under the pad.',
@@ -803,7 +885,7 @@ const PLAN = {
       cues:['Keep wrists neutral throughout','Elbows stay at your sides','Squeeze at the top','Control the lowering phase'],
       mistakes:['Swinging the torso','Letting elbows flare forward','Rushing the negative']}),
   ]},
-  fri:{label:'Fri', title:'Legs + Core (Hypertrophy)', exercises:[
+  fri:{label:'Sat', title:'Legs + Core (Hypertrophy)', exercises:[
     ex('fri_frontsquat','Front Squat / Goblet Squat','3×10',3,'wr',150,{
       muscles:['Quads','Glutes','Core'],
       setup:'Bar racked on front delts (or dumbbell/kettlebell held at chest for goblet version).',
@@ -849,6 +931,52 @@ const PLAN = {
   ]},
 };
 
+/* ---------- Progression step per exercise (kg added when every set hits the top of the range) ----------
+   Small-frame lifters get proportionally big jumps from a flat +2.5 kg on isolation work, so
+   isolation lifts step by 1 kg, upper compounds by 2–2.5 kg, and big lower-body lifts by 5 kg.
+   Anything not listed falls back to 2.5 kg. */
+const INC = {
+  mon_bench:2.5, mon_row:2.5, mon_ohp:2, mon_latpull:2.5, mon_latraise:1, mon_curl:2, mon_tripush:1,
+  tue_squat:5, tue_rdl:5, tue_legpress:5, tue_legcurl:2.5, tue_calf:5, tue_hkr:1,
+  wed_incline:2, wed_machinechest:2.5, wed_dbshoulder:2, wed_latraise:1, wed_ropepush:1, wed_pecdeck:2.5,
+  thu_widelatpull:2.5, thu_chestrow:2.5, thu_facepull:1, thu_reardeltfly:1, thu_inclinecurl:1, thu_hammercurl:1,
+  fri_frontsquat:2.5, fri_slrdl:2, fri_legext:2.5, fri_legcurl:2.5, fri_calf:2.5, fri_reversecrunch:1
+};
+
+/* ---------- Build-specific warnings (narrow frame, small wrists, fast recovery limiter = food/sleep) ---------- */
+const BUILD = {
+  mon_bench:`Small wrists: keep them stacked over the forearms (wraps are fine). Elbows about 45–60° from the torso to spare the shoulders. Stop 1–2 reps short of failure — grinding a heavy bar is where narrow-framed lifters get shoulder injuries.`,
+  mon_row:`This is the one that stacks on your lower back: Tuesday's squat and RDL load the same muscles again within 24 h. Keep the torso rigid, use straps if grip is the limit, and swap to a chest-supported row if back fatigue carries into Tuesday.`,
+  mon_ohp:`Keep wrists neutral and don't lean back to finish reps — that turns shoulder work into lumbar stress. Shoulders take pressing again on Thursday, so leave 1–2 reps in reserve here.`,
+  mon_latraise:`Light and strict wins. Going heavy just recruits the traps. Step up by 1 kg at a time.`,
+  mon_curl:`If a straight bar bothers your wrists or elbows, use an EZ-bar. Elbows stay pinned.`,
+  mon_tripush:`Elbow tendons already absorb pressing all week. Stop the set at any pinch on the inner or back of the elbow.`,
+  tue_squat:`Heaviest spinal load of the week on a narrower frame. Warm up properly, brace hard, use safety pins, and end the set when bar speed collapses or form slips — not at failure. Eat carbs before this session.`,
+  tue_rdl:`Highest lower-back risk in the plan. End the set when your back position changes, not when you can't lift it. Straps recommended so grip doesn't cut your sets short.`,
+  tue_legpress:`Don't let your hips curl off the pad at the bottom — that's lumbar flexion under load. Shorten the range if it happens.`,
+  tue_hkr:`If hanging irritates your shoulders, use a captain's chair or straps. No swinging.`,
+  wed_incline:`After Monday's bench and press, this is the third chest/shoulder/triceps hit inside 72 h. Leave 1–2 reps in reserve and set dumbbells down safely — don't kick them up with a narrow-frame shoulder.`,
+  wed_dbshoulder:`Shoulders were pressed heavy on Monday. If you feel a pinch at the front of the shoulder, drop one set or move to a neutral-grip press.`,
+  wed_latraise:`Highest weekly delt frequency lives here. Keep it strict; stop at the first sign of shoulder pinching.`,
+  wed_ropepush:`Elbow tendons again — keep the elbows still and stop before they start to ache.`,
+  thu_facepull:`This is shoulder-health work for a week full of pressing. Go light and slow, focus on external rotation.`,
+  thu_reardeltfly:`Small muscle, small weight. If you need momentum, the weight is too heavy.`,
+  fri_frontsquat:`The front rack needs wrist and shoulder mobility. If your small wrists complain, use the goblet version or straps instead of forcing the rack position. Keep this lighter than Tuesday.`,
+  fri_slrdl:`Keep it moderate — balance and the lower back both limit this lift, and it follows Tuesday's heavy RDL by four days.`,
+  fri_legext:`No violent lockouts at the top. Control the weight through the whole range.`,
+  fri_plank:`Stop the set when the hips sag. A short clean hold beats a long sloppy one.`
+};
+
+const DAY_NOTES = {
+  mon:`<b>Heavy day.</b> Compounds: stop 1–2 reps short of failure; only the isolation sets can go to failure. Warm up with 2–3 ramp-up sets on bench. The barbell row loads your lower back the day before squats and RDLs — if you're still sore on Tuesday, swap it for a chest-supported row.`,
+  tue:`<b>Heaviest spinal day.</b> Warm up properly, brace hard, use pins in the rack. Skip the last rep of any set where form slips, especially on the RDL. Have carbs before this session — heavy legs on low fuel is where narrow-framed lifters run out of gas.`,
+  wed:`<b>Hypertrophy day after a rest day.</b> Presses can sit 1–2 reps from failure; isolation can go to failure. Chest, shoulders and triceps were worked heavy on Monday — if elbows or front delts ache, drop one set from the presses and keep lateral raises light and strict.`,
+  thu:`<b>Back and arms.</b> Straps are fine if grip fails before your back does. Don't chase weight on face pulls and rear delts. Biceps already get indirect volume from every row and pulldown — resist the urge to add curls.`,
+  fri:`<b>Second leg day.</b> Keep it lighter than Tuesday — the goal is muscle, not a second max effort. Watch the lower back on single-leg RDLs and the knees on leg extensions. Core is done here; more ab work adds fatigue without much return.`
+};
+
+const REST_DAYS = [0,3]; // Sunday, Wednesday
+
 const EX_INDEX = {};
 Object.keys(PLAN).forEach(dayKey=>{
   PLAN[dayKey].exercises.forEach(exItem=>{
@@ -874,8 +1002,12 @@ function daysAgoISO(n){
   const local = new Date(d.getTime() - off*60000);
   return local.toISOString().slice(0,10);
 }
+function daysBetween(a,b){
+  return Math.round((Date.parse(b+'T00:00:00Z') - Date.parse(a+'T00:00:00Z'))/86400000);
+}
 function defaultDayFromWeekday(){
-  const map = {1:'mon',2:'tue',3:'wed',4:'thu',5:'fri'};
+  // Wed is a rest day, so it opens Thursday's workout (the next one up); Sun opens Monday.
+  const map = {1:'mon',2:'tue',3:'wed',4:'wed',5:'thu',6:'fri'};
   return map[new Date().getDay()] || 'mon';
 }
 currentDay = defaultDayFromWeekday();
@@ -981,6 +1113,7 @@ async function logBodyweight(){
   await safeSet('bodyweight_log', filtered.slice(-90));
   input.value = '';
   renderBodyweight();
+  renderRecovery();
 }
 
 /* ---------- Consistency heatmap ---------- */
@@ -999,6 +1132,133 @@ async function renderHeatmap(){
   const count = dates.filter(d=>trained.has(d)).length;
   document.getElementById('heatmapCaption').textContent = `${count} of 28 days trained`;
 }
+
+/* ---------- Recovery check ---------- */
+async function getDeloadState(){
+  const ds = await safeGet('deload_start');
+  const since = ds ? daysBetween(ds, todayISO()) : null;
+  const active = since!==null && since>=0 && since<7;
+  return {start: ds, since, active};
+}
+
+async function renderRecovery(){
+  const trained = new Set((await safeGet('trained_dates')) || []);
+  const today = todayISO();
+  const sorted = Array.from(trained).sort();
+
+  // Consecutive training days, counted back from today (or yesterday if today isn't trained yet)
+  let streak = 0;
+  let i = trained.has(today) ? 0 : 1;
+  while(i<60 && trained.has(daysAgoISO(i))){ streak++; i++; }
+
+  let last7 = 0;
+  for(let k=0;k<7;k++) if(trained.has(daysAgoISO(k))) last7++;
+
+  const dl = await getDeloadState();
+  let weeksOn = 0;
+  if(dl.start){ weeksOn = Math.max(0, Math.floor((dl.since-7)/7)); }
+  else if(sorted.length){ weeksOn = Math.floor(daysBetween(sorted[0], today)/7); }
+
+  const items = [];
+
+  if(dl.active){
+    items.push({lvl:'info', html:`<b>Deload week, day ${dl.since+1} of 7.</b> Do about half the usual sets, keep weights the same or drop them 10%, and stop 3+ reps short of failure. Sleep and eat as normal.`});
+  } else if(weeksOn>=7){
+    items.push({lvl:'alert', html:`<b>${weeksOn} weeks without a deload.</b> At this volume (about 95 hard sets a week) you should deload every 5–6 weeks. Take one now, even if you feel fine — fatigue hides behind motivation.`});
+  } else if(weeksOn>=5){
+    items.push({lvl:'warn', html:`<b>Week ${weeksOn+1} since your last deload.</b> A deload is due this week or next.`});
+  }
+
+  if(streak>=5){
+    items.push({lvl:'alert', html:`<b>${streak} training days in a row.</b> Take a rest day before the next session. Lifting heavy without a break is how tendons and the lower back get overloaded.`});
+  } else if(streak===4){
+    items.push({lvl:'warn', html:`<b>4 days in a row.</b> Your next day should be a rest day.`});
+  }
+
+  if(last7>=6){
+    items.push({lvl:'alert', html:`<b>${last7} sessions in the last 7 days.</b> The plan is 5 — more than that means recovery is being spent, not built.`});
+  }
+
+  const dow = new Date().getDay();
+  if(REST_DAYS.includes(dow) && !trained.has(today)){
+    items.push({lvl:'info', html:`<b>Planned rest day.</b> A walk, mobility work and a proper meal are the job today. Keep boxing/cardio easy or skip it.`});
+  }
+
+  // Body-weight trend over the last 3 weeks
+  const bw = (await safeGet('bodyweight_log')) || [];
+  const recent = bw.filter(e=>{ const d = daysBetween(e.date, today); return d>=0 && d<=21; });
+  if(recent.length>=2){
+    const first = recent[0], last = recent[recent.length-1];
+    const span = daysBetween(first.date, last.date);
+    if(span>=10){
+      const rate = (last.weight - first.weight)/(span/7);
+      if(rate>0.5){
+        items.push({lvl:'warn', html:`<b>Gaining about ${rate.toFixed(2)} kg/week.</b> On your build a pace above ~0.3–0.5 kg/week is mostly fat. Trim 150–200 kcal a day rather than training more.`});
+      } else if(rate<-0.4){
+        items.push({lvl:'warn', html:`<b>Losing about ${Math.abs(rate).toFixed(2)} kg/week while training 5 days.</b> That usually means you're under-eating for this volume. Expect stalled lifts and slower recovery — add 200–300 kcal, carbs around training first.`});
+      }
+    }
+  }
+
+  if(!items.length){
+    items.push({lvl:'ok', html:`<b>No recovery flags.</b> Keep leaving 1–2 reps in reserve on compounds.`});
+  }
+
+  document.getElementById('rcStats').innerHTML = `
+    <span>Streak <b>${streak}d</b></span>
+    <span>Last 7 days <b>${last7}</b> sessions</span>
+    <span>Since deload <b>${dl.active ? 'deloading now' : weeksOn+'w'}</b></span>`;
+  document.getElementById('rcList').innerHTML = items.map(it=>`<li class="rc-item ${it.lvl}">${it.html}</li>`).join('');
+  document.getElementById('deloadBtn').textContent = dl.active ? 'End deload week' : 'Start deload week today';
+}
+
+document.getElementById('deloadBtn').onclick = async ()=>{
+  const dl = await getDeloadState();
+  await safeSet('deload_start', dl.active ? null : todayISO());
+  renderRecovery();
+  renderDay();
+};
+
+/* ---------- Build notes modal ---------- */
+function openGuideModal(){
+  document.getElementById('guideModalBody').innerHTML = `
+    <div class="info-section">
+      <div class="info-label">About body-type labels</div>
+      <div class="info-text">“Ecto/meso hybrid” is a rough description, not a hard category. What it points to in practice: a narrower frame gives joints and tendons less to work with under heavy load, and a fast metabolism means recovery is limited more by food and sleep than by the program. Trust your own logs over the label.</div>
+    </div>
+    <div class="info-section">
+      <div class="info-label">Recovery limiters</div>
+      <ul class="bullet-list">
+        <li>Eat a small surplus — about 200–300 kcal over maintenance with 1.6–2.2 g/kg protein. A bigger surplus mostly becomes fat on your build.</li>
+        <li>Don't run very low carbs on Monday, Tuesday and Saturday. Heavy compound days need glycogen.</li>
+        <li>Sleep 7–9 hours. Short sleep costs more than a skipped session.</li>
+        <li>Wednesday and Sunday are rest days. Don't turn them into hard cardio or extra lifting.</li>
+        <li>Boxing or cardio: 1–2 easy-to-moderate sessions a week, away from the day before Tuesday and Saturday leg days.</li>
+      </ul>
+    </div>
+    <div class="info-section">
+      <div class="info-label">Load management</div>
+      <ul class="bullet-list">
+        <li>Leave 1–2 reps in reserve on compounds. Only isolation sets go to failure.</li>
+        <li>Deload every 5–6 weeks (button in Recovery Check). Around 95 hard sets a week is already near the upper end.</li>
+        <li>If a lift stalls, check food and sleep first, then technique. Adding sets is the last thing to try.</li>
+        <li>Progression steps are now per lift: 1 kg on lateral raises, curls and pushdowns, 2–2.5 kg on upper compounds, 5 kg on squat, RDL and leg press. Override any suggestion by typing your own weight.</li>
+        <li>Lower-back stacking: Monday row, Tuesday squat and RDL, Saturday front squat and single-leg RDL. If the back is fatigued going into Tuesday, swap the row.</li>
+      </ul>
+    </div>
+    <div class="info-section">
+      <div class="info-label">Stop signs</div>
+      <ul class="bullet-list mistake-list">
+        <li>Sharp, pinching or joint-line pain (elbow, shoulder, wrist, knee): stop that exercise for the day and swap or drop it.</li>
+        <li>Pain that lasts beyond 48 h or gets worse week to week, numbness or tingling, or pain running down an arm or leg: stop that lift and get it assessed.</li>
+        <li>Weights falling for two sessions in a row, poor sleep and constant fatigue: start the deload early.</li>
+      </ul>
+    </div>`;
+  document.getElementById('guideModal').classList.add('open');
+}
+document.getElementById('guideBtn').onclick = openGuideModal;
+document.getElementById('guideModalClose').onclick = ()=> document.getElementById('guideModal').classList.remove('open');
+document.getElementById('guideModal').addEventListener('click', (e)=>{ if(e.target.id==='guideModal') e.currentTarget.classList.remove('open'); });
 
 /* ---------- Day tabs ---------- */
 function renderTabs(){
@@ -1035,7 +1295,8 @@ function parseTarget(target){
    sets of an exercise for a given session. Reps are pushed up, set to set
    and session to session, within the prescribed rep range. Weight only goes
    up once every prescribed set hits the TOP of the rep range in the same
-   session — never mid-session, never automatically every session. */
+   session — never mid-session, never automatically every session.
+   The size of the jump is per exercise (see INC). */
 function computeSuggestion(exObj, lastEntry){
   if(!lastEntry || exObj.type!=='wr') return null;
   const {min,max} = parseTarget(exObj.target);
@@ -1053,12 +1314,13 @@ function computeSuggestion(exObj, lastEntry){
   const hitTopEverySet = reps.length>=exObj.sets && reps.every(r=>r>=max);
 
   if(hitTopEverySet){
-    const suggestedWeight = Math.round((topWeight+2.5)*2)/2;
+    const inc = INC[exObj.id] !== undefined ? INC[exObj.id] : 2.5;
+    const suggestedWeight = Math.round((topWeight+inc)*2)/2;
     return {
       suggestedWeight,
       increase:true,
       lines:[
-        `Increase to ${suggestedWeight} kg`,
+        `Increase to ${suggestedWeight} kg (+${inc})`,
         `Previous: ${repsStr}`,
         `You reached the top of the rep range on every set.`
       ]
@@ -1148,6 +1410,7 @@ function openInfoModal(exObj){
       <div class="info-label">Common Mistakes</div>
       <ul class="bullet-list mistake-list">${(info.mistakes||[]).map(m=>`<li>${m}</li>`).join('')}</ul>
     </div>
+    ${BUILD[exObj.id] ? `<div class="build-box"><b>For your build:</b> ${BUILD[exObj.id]}</div>` : ''}
     ${info.safety ? `<div class="safety-box"><b>Safety:</b> ${info.safety}</div>` : ''}
   `;
   document.getElementById('infoModal').classList.add('open');
@@ -1258,6 +1521,12 @@ async function renderDay(){
   const list = document.getElementById('exerciseList');
   list.innerHTML = '';
 
+  const dl = await getDeloadState();
+  const noteBox = document.createElement('div');
+  noteBox.className = 'day-note' + (dl.active ? ' deload' : '');
+  noteBox.innerHTML = (dl.active ? `<b>Deload week.</b> About half the sets, same weights or 10% lighter, stop 3+ reps short of failure. ` : '') + (DAY_NOTES[currentDay] || '');
+  list.appendChild(noteBox);
+
   for(const exObj of d.exercises){
     const hist = (await safeGet('hist_'+exObj.id)) || [];
     histCache[exObj.id] = hist;
@@ -1268,6 +1537,7 @@ async function renderDay(){
     const suggestion = computeSuggestion(exObj, lastEntry);
     const volume = todayEntry ? computeVolume(todayEntry) : 0;
     const oneRM = todayEntry ? compute1RM(todayEntry) : null;
+    const buildNote = BUILD[exObj.id];
 
     const card = document.createElement('div');
     card.className = 'exercise';
@@ -1278,7 +1548,7 @@ async function renderDay(){
       <div class="ex-top">
         <div class="ex-name-row">
           <div class="ex-check ${todayEntry && todayEntry.done ? 'done' : ''}"></div>
-          <div class="ex-name">${exObj.name} <span class="ex-expand-icon">▾</span></div>
+          <div class="ex-name">${exObj.name}${buildNote ? ' <span class="warn-dot" title="Build note inside">⚠</span>' : ''} <span class="ex-expand-icon">▾</span></div>
         </div>
         <div class="ex-target">${exObj.target}</div>
       </div>
@@ -1290,6 +1560,7 @@ async function renderDay(){
         <div class="ex-actions-row">
           <button type="button" class="info-btn">How to</button>
         </div>
+        ${buildNote ? `<div class="ex-build"><b>For your build:</b> ${buildNote}</div>` : ''}
         ${suggestion ? `<div class="ex-suggestion"><b style="color:${suggestion.increase?'var(--accent)':'var(--text)'}">${suggestion.lines[0]}</b><br>${suggestion.lines.slice(1).join('<br>')}</div>` : ''}
         <div class="sets-grid"></div>
         <button type="button" class="add-set-btn">+ add set</button>
@@ -1484,6 +1755,7 @@ async function saveSession(){
     trained.add(currentDate);
     await safeSet('trained_dates', Array.from(trained).sort().slice(-90));
     renderHeatmap();
+    renderRecovery();
   }
 
   // duration
@@ -1513,6 +1785,7 @@ function showCompletionModal(summary){
     : 'No prior session to compare';
   const nextIdx = (DAY_ORDER.indexOf(currentDay)+1) % DAY_ORDER.length;
   const nextDay = PLAN[DAY_ORDER[nextIdx]];
+  const nextPrefix = nextDay.restBefore ? 'Rest day next, then' : 'Next workout:';
 
   document.querySelector('#completionModal .modal-title').textContent = summary.allDone ? 'Workout Complete' : 'Partial Workout Saved';
   document.getElementById('completionModalBody').innerHTML = `
@@ -1523,7 +1796,7 @@ function showCompletionModal(summary){
       <div class="completion-stat"><div class="val">${summary.totalPRs}</div><div class="lbl">PRs Hit</div></div>
     </div>
     <div class="info-text">${volChangeText}</div>
-    <div class="completion-next">Next workout: <b>${nextDay.label} — ${nextDay.title}</b></div>
+    <div class="completion-next">${nextPrefix} <b>${nextDay.label} — ${nextDay.title}</b></div>
   `;
   document.getElementById('completionModal').classList.add('open');
 }
@@ -1586,6 +1859,7 @@ renderTabs();
 renderDay();
 renderBodyweight();
 renderHeatmap();
+renderRecovery();
 </script>
 </body>
 </html>
