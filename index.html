@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SWAP FITNESS</title>
+<title>SWAP FITNESS · Hybrid Athletic</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -622,12 +622,18 @@ header{
 
   <div class="panel-row">
     <div class="panel">
-      <div class="panel-title">Body Weight</div>
+      <div class="panel-title">Body Weight &amp; Waist</div>
       <div class="bw-row">
         <input type="number" inputmode="decimal" step="0.1" id="bwInput" placeholder="kg">
         <button class="bw-log-btn" id="bwLogBtn">Log</button>
         <span class="bw-stat" id="bwStat"></span>
       </div>
+      <div class="bw-row">
+        <input type="number" inputmode="decimal" step="0.1" id="waistInput" placeholder="cm">
+        <button class="bw-log-btn" id="waistLogBtn">Log waist</button>
+        <span class="bw-stat" id="waistStat"></span>
+      </div>
+      <div class="bw-stat" style="margin-bottom:8px;">Measure at the navel, relaxed, same time of day.</div>
       <div id="bwChart"></div>
     </div>
     <div class="panel">
@@ -725,210 +731,49 @@ function ex(id, name, target, sets, type, rest, info){
    The object keys (mon/tue/wed/thu/fri) are internal IDs only — they are kept unchanged so
    previously saved history still loads. Only the display labels moved. */
 const PLAN = {
-  mon:{label:'Mon', title:'Upper Body (Heavy)', restBefore:true, exercises:[
-    ex('mon_bench','Barbell Bench Press','4×6-8',4,'wr',150,{
-      muscles:['Chest','Triceps','Front Delts'],
-      setup:'Lie on the bench with eyes under the bar, feet flat, shoulder blades pulled together.',
-      perform:'Lower the bar to mid-chest under control, then press up and slightly back to lockout.',
-      cues:['Retract shoulder blades','Brace core before unracking','Keep wrists stacked over elbows','Control the descent, drive on the press'],
-      mistakes:['Bouncing the bar off the chest','Flaring elbows to 90°','Lifting hips off the bench'],
-      safety:'Use a spotter or safety pins when working near your max.'}),
-    ex('mon_row','Bent Over Barbell Row','4×6-8',4,'wr',120,{
-      muscles:['Lats','Rhomboids','Rear Delts','Biceps'],
-      setup:'Hinge at the hips to roughly 45°, knees soft, bar hanging at arm’s length.',
-      perform:'Pull the bar to your lower ribs, squeezing shoulder blades together, then lower with control.',
-      cues:['Flat back throughout','Pull with elbows, not hands','Keep the bar close to the shins/thighs','Avoid using momentum'],
-      mistakes:['Rounding the lower back','Standing up between reps','Yanking the weight with a jerk']}),
-    ex('mon_ohp','Seated Overhead Press','3×6-8',3,'wr',120,{
-      muscles:['Front & Side Delts','Triceps','Upper Chest'],
-      setup:'Sit tall, bar or dumbbells at shoulder height, core braced.',
-      perform:'Press straight overhead until arms lock out, then lower under control to shoulder level.',
-      cues:['Brace like you’re about to be punched','Keep the bar path close to your face','Squeeze glutes for stability','Full lockout overhead'],
-      mistakes:['Excessive lower back arch','Pressing the bar forward instead of up','Partial range of motion']}),
-    ex('mon_latpull','Lat Pulldown','3×8-10',3,'wr',90,{
-      muscles:['Lats','Biceps','Rear Delts'],
-      setup:'Grip slightly wider than shoulders, thighs secured under the pad.',
-      perform:'Pull the bar to your upper chest, driving elbows down and back, then control it back up.',
-      cues:['Lead with the elbows','Slight lean back, not a big swing','Squeeze lats at the bottom','Avoid using body momentum'],
-      mistakes:['Pulling behind the neck','Yanking with the arms only','Not controlling the eccentric']}),
-    ex('mon_latraise','Cable Lateral Raise','3×12-15',3,'wr',60,{
-      muscles:['Side Delts'],
-      setup:'Stand side-on to the cable, handle at hip height, slight bend in the elbow.',
-      perform:'Raise the arm out to shoulder height, then lower slowly.',
-      cues:['Lead with the elbow, not the hand','Stop at shoulder height','Control the negative','Keep torso still'],
-      mistakes:['Using momentum/swinging','Shrugging the shoulder up','Raising above shoulder height']}),
-    ex('mon_curl','Barbell Curl','2×10-12',2,'wr',60,{
-      muscles:['Biceps','Forearms'],
-      setup:'Stand tall, shoulder-width grip, elbows pinned to your sides.',
-      perform:'Curl the bar up without moving the elbows, squeeze, then lower fully.',
-      cues:['Elbows stay locked at your sides','Full range each rep','Squeeze at the top','Control the lowering phase'],
-      mistakes:['Swinging the torso for momentum','Letting elbows drift forward','Only doing half reps']}),
-    ex('mon_tripush','Triceps Rope Pushdown','2×10-12',2,'wr',60,{
-      muscles:['Triceps'],
-      setup:'Stand close to the cable stack, elbows tucked at your sides.',
-      perform:'Extend the arms down and slightly apart at the bottom, then return with control.',
-      cues:['Keep elbows pinned','Full lockout at the bottom','Spread the rope apart at full extension','Don’t let elbows flare out'],
-      mistakes:['Using shoulders to push down','Leaning the whole body into it','Letting elbows drift away from the body']}),
+  mon:{label:'Mon', title:'Strength A · Upper + Carry', restBefore:true, exercises:[
+    ex('mon_bench','Barbell Bench Press','3×5-8',3,'wr',150,{muscles:['Chest','Triceps','Front Delts'],setup:'Set shoulder blades against the bench, feet planted, and use a spotter or safety pins.',perform:'Lower under control to mid-chest and press smoothly.',cues:['Brace before unracking','Keep wrists stacked','Leave 1–2 reps in reserve'],mistakes:['Bouncing the bar','Lifting hips','Grinding failed reps']}),
+    ex('mon_pullup','Strict Pull-up','3×4-7',3,'wr',150,{muscles:['Lats','Upper Back','Biceps'],setup:'Use a shoulder-width grip and begin from a controlled hang.',perform:'Pull until chin clears the bar, then lower under control.',cues:['No swinging','Full comfortable range','Stop before form breaks'],mistakes:['Kipping','Half reps','Shrugging through every rep']}),
+    ex('mon_ohp','Overhead Press','3×5-8',3,'wr',120,{muscles:['Shoulders','Triceps','Core'],setup:'Stand or sit tall with ribs down and wrists stacked.',perform:'Press overhead without leaning back.',cues:['Brace glutes and abs','Keep bar path close','Finish overhead'],mistakes:['Excessive back arch','Bouncing','Painful range']}),
+    ex('mon_chestrow','Chest-Supported Row','3×6-10',3,'wr',120,{muscles:['Lats','Rhomboids','Rear Delts'],setup:'Set the bench or machine so your chest stays supported.',perform:'Pull elbows toward hips, pause, and lower slowly.',cues:['Keep chest planted','Avoid shrugging','Control the return'],mistakes:['Jerking the load','Shortening reps']}),
+    ex('mon_carry','Farmer Carry','3×30-40 m',3,'wr',75,{muscles:['Grip','Traps','Core','Conditioning'],setup:'Pick up two challenging dumbbells and stand tall.',perform:'Walk steadily with short controlled steps.',cues:['Ribs stacked over pelvis','Shoulders relaxed','No leaning side to side'],mistakes:['Rushing','Overarching lower back']}),
+    ex('mon_latraise','Cable Lateral Raise','2×12-15',2,'wr',60,{muscles:['Side Delts'],setup:'Stand beside a low cable with a slight elbow bend.',perform:'Raise to about shoulder height and lower slowly.',cues:['Use a light load','Keep torso still'],mistakes:['Swinging','Shrugging heavily']})
   ]},
-  tue:{label:'Tue', title:'Lower Body (Heavy)', exercises:[
-    ex('tue_squat','Barbell Squat','4×6-8',4,'wr',180,{
-      muscles:['Quads','Glutes','Hamstrings','Core'],
-      setup:'Bar on upper traps, feet roughly shoulder-width, toes slightly out.',
-      perform:'Brace, break at the hips and knees together, descend to at least parallel, then drive through the floor.',
-      cues:['Brace core hard before descending','Knees track over toes','Keep chest up, not just head up','Drive through mid-foot'],
-      mistakes:['Knees caving inward','Excessive forward lean','Bouncing out of the bottom uncontrolled'],
-      safety:'Use safety bars/pins in a rack when training near failure.'}),
-    ex('tue_rdl','Romanian Deadlift','3×6-8',3,'wr',150,{
-      muscles:['Hamstrings','Glutes','Lower Back'],
-      setup:'Stand tall holding the bar at hip level, feet hip-width.',
-      perform:'Push hips back while keeping the bar close to your legs, lower until you feel a hamstring stretch, then drive hips forward to stand.',
-      cues:['Soft knee bend, hips do the work','Keep the bar brushing your legs','Flat back throughout','Stop when hamstrings feel stretched'],
-      mistakes:['Rounding the back','Turning it into a squat by bending the knees too much','Bar drifting away from the body']}),
-    ex('tue_legpress','Leg Press','3×10',3,'wr',90,{
-      muscles:['Quads','Glutes','Hamstrings'],
-      setup:'Feet shoulder-width on the platform, lower back flat against the pad.',
-      perform:'Lower the platform until knees reach about 90°, then press back up without locking out hard.',
-      cues:['Keep lower back flat on the pad','Don’t let knees cave in','Control the descent','Avoid full lockout slamming the knees'],
-      mistakes:['Letting the lower back round at the bottom','Placing feet too low on the platform','Bouncing the weight']}),
-    ex('tue_legcurl','Leg Curl','3×10-12',3,'wr',60,{
-      muscles:['Hamstrings'],
-      setup:'Lie face down (or seated depending on machine), pad against the lower calves.',
-      perform:'Curl the pad toward your glutes, squeeze, then lower with control.',
-      cues:['Keep hips pressed into the pad','Full squeeze at the top','Slow, controlled negative','Avoid lifting hips off the bench'],
-      mistakes:['Using hip drive/momentum','Only partial range of motion','Letting the weight drop']}),
-    ex('tue_calf','Standing Calf Raise','3×15',3,'wr',60,{
-      muscles:['Calves'],
-      setup:'Balls of feet on the platform, knees straight but not locked.',
-      perform:'Rise onto your toes as high as possible, pause, then lower until you feel a stretch.',
-      cues:['Full stretch at the bottom','Pause at the top','Control the tempo, don’t bounce','Keep knees soft, not locked'],
-      mistakes:['Using tiny partial reps','Bouncing at the bottom','Letting knees bend to cheat the rep']}),
-    ex('tue_hkr','Hanging Knee Raise','3×12',3,'wr',60,{
-      muscles:['Abs','Hip Flexors'],
-      setup:'Hang from a bar with a firm grip, shoulders engaged.',
-      perform:'Raise the knees toward your chest by curling the pelvis, then lower with control.',
-      cues:['Curl the pelvis, don’t just swing the legs','Avoid using momentum','Exhale as you raise','Control the lowering phase'],
-      mistakes:['Swinging the whole body','Using momentum instead of ab strength','Not controlling the descent']}),
+  tue:{label:'Tue', title:'Strength B · Lower Body', exercises:[
+    ex('tue_squat','Barbell Squat','3×5-8',3,'wr',180,{muscles:['Quads','Glutes','Core'],setup:'Set the bar securely and brace before each rep.',perform:'Squat to a controlled depth that keeps your feet planted and torso stable.',cues:['Knees track with toes','Brace before descent','Use rack safety pins'],mistakes:['Knees collapsing','Losing brace','Grinding through form breakdown']}),
+    ex('tue_rdl','Romanian Deadlift','3×6-8',3,'wr',150,{muscles:['Hamstrings','Glutes','Back'],setup:'Hold the bar close, soften knees, and brace.',perform:'Push hips back until hamstrings stretch, then stand by driving hips forward.',cues:['Bar stays close','Spine stays neutral','End set before form changes'],mistakes:['Turning it into a squat','Rounding the back','Overreaching depth']}),
+    ex('tue_split','Bulgarian Split Squat','2×8-10/leg',2,'wr',90,{muscles:['Quads','Glutes','Balance'],setup:'Place rear foot on a low bench and find a stable stance.',perform:'Lower under control and drive through the front foot.',cues:['Keep front foot planted','Use support if balance limits effort'],mistakes:['Bouncing','Knee collapsing inward']}),
+    ex('tue_legcurl','Seated Leg Curl','2×10-15',2,'wr',75,{muscles:['Hamstrings'],setup:'Align knees with machine pivot and set the pad securely.',perform:'Curl smoothly, pause, and return under control.',cues:['Keep hips down','Control the negative'],mistakes:['Using momentum','Short range']}),
+    ex('tue_calf','Standing Calf Raise','2×10-15',2,'wr',60,{muscles:['Calves'],setup:'Use a stable platform and hold support if needed.',perform:'Rise high, pause, and lower to a comfortable stretch.',cues:['No bouncing','Full controlled range'],mistakes:['Tiny reps','Dropping quickly']}),
+    ex('tue_core','Dead Bug','3×8-10/side',3,'wr',45,{muscles:['Core'],setup:'Lie on your back with hips and knees at 90 degrees.',perform:'Extend opposite arm and leg while keeping the lower back gently against the floor.',cues:['Move slowly','Breathe out as you extend'],mistakes:['Arching the back','Rushing reps']}),
+    ex('tue_mobility','Hip + Ankle Mobility','2×45 sec',2,'time',30,{muscles:['Mobility'],setup:'Use a comfortable half-kneeling ankle drill and hip-flexor stretch.',perform:'Move gently within a pain-free range and breathe steadily.',cues:['No forcing range','Keep it easy'],mistakes:['Bouncing hard','Stretching through sharp pain']})
   ]},
-  wed:{label:'Thu', title:'Push (Hypertrophy)', restBefore:true, exercises:[
-    ex('wed_incline','Incline Dumbbell Press','3×10-12',3,'wr',120,{
-      muscles:['Upper Chest','Front Delts','Triceps'],
-      setup:'Bench set to 30-45°, dumbbells at shoulder level.',
-      perform:'Press the dumbbells up and slightly inward until arms are extended, then lower under control.',
-      cues:['Keep a slight arch, shoulder blades back','Control the dumbbells down to a stretch','Press up and in, not just up','Avoid banging dumbbells together hard'],
-      mistakes:['Setting the bench too steep (turns it into a shoulder press)','Flaring elbows to 90°','Bouncing at the bottom']}),
-    ex('wed_machinechest','Machine Chest Press','3×10-12',3,'wr',90,{
-      muscles:['Chest','Triceps','Front Delts'],
-      setup:'Seat height so handles line up with mid-chest.',
-      perform:'Press the handles forward to extension, then return with control.',
-      cues:['Keep shoulder blades pinned to the pad','Full stretch on the way back','Controlled tempo both directions','Avoid shrugging the shoulders up'],
-      mistakes:['Using momentum from the legs/hips','Partial range of motion','Locking out and relaxing at the top']}),
-    ex('wed_dbshoulder','Seated Dumbbell Shoulder Press','3×10-12',3,'wr',120,{
-      muscles:['Front & Side Delts','Triceps'],
-      setup:'Seated with back support, dumbbells at shoulder height, palms forward.',
-      perform:'Press the dumbbells up until arms are extended, then lower to shoulder level.',
-      cues:['Brace the core','Don’t let the dumbbells drift too far forward','Full range on each rep','Control the lowering phase'],
-      mistakes:['Excessive back arch','Only partial lockout','Uneven pressing side to side']}),
-    ex('wed_latraise','Cable Lateral Raise','4×12-15',4,'wr',60,{
-      muscles:['Side Delts'],
-      setup:'Stand side-on to the cable, slight elbow bend.',
-      perform:'Raise the arm to shoulder height, then lower slowly.',
-      cues:['Lead with the elbow','Stop at shoulder height','Control the negative','Keep the torso still'],
-      mistakes:['Swinging for momentum','Shrugging the shoulder','Going above shoulder height']}),
-    ex('wed_ropepush','Rope Triceps Pushdown','3×12-15',3,'wr',60,{
-      muscles:['Triceps'],
-      setup:'Elbows tucked at your sides, rope grip.',
-      perform:'Extend down and spread the rope apart at the bottom, then return with control.',
-      cues:['Pin the elbows','Full lockout at the bottom','Spread the rope at extension','Don’t lean into it with the whole body'],
-      mistakes:['Using the shoulders to drive the movement','Letting elbows flare out','Half reps']}),
-    ex('wed_pecdeck','Pec Deck Fly','2×12-15',2,'wr',60,{
-      muscles:['Chest'],
-      setup:'Back flat against the pad, handles at chest height.',
-      perform:'Bring the handles together in front of your chest, squeeze, then return to a stretch.',
-      cues:['Squeeze the chest at the peak','Control the stretch on the way back','Keep a slight bend in the elbows','Avoid slamming the pads together'],
-      mistakes:['Using momentum to bang the pads together','Shrugging shoulders up','Not controlling the eccentric']}),
+  wed:{label:'Thu', title:'Strength C · Calisthenics', restBefore:true, exercises:[
+    ex('wed_incline','Incline Dumbbell Press','3×6-10',3,'wr',120,{muscles:['Upper Chest','Triceps','Front Delts'],setup:'Set bench to a modest incline and keep shoulder blades stable.',perform:'Lower dumbbells beside the upper chest and press up smoothly.',cues:['Control the descent','Leave 1–2 reps in reserve'],mistakes:['Excessive incline','Clanging dumbbells']}),
+    ex('wed_dips','Parallel-Bar Dips','3×5-9',3,'wr',120,{muscles:['Chest','Triceps','Shoulders'],setup:'Use parallel bars; keep shoulders comfortable and torso controlled.',perform:'Lower only as far as pain-free control allows, then press up.',cues:['No bouncing','Shoulders stay controlled','Use assistance if reps fall below range'],mistakes:['Forcing excessive depth','Kipping','Shoulder pain']}),
+    ex('wed_pullup','Pull-up or Chin-up','3×4-7',3,'wr',120,{muscles:['Lats','Biceps','Upper Back'],setup:'Choose a grip that feels comfortable.',perform:'Pull smoothly and lower under control.',cues:['No swinging','Keep reps clean'],mistakes:['Kipping','Half reps']}),
+    ex('wed_row','Chest-Supported Row','2×8-12',2,'wr',90,{muscles:['Upper Back','Lats','Rear Delts'],setup:'Keep chest supported on bench or machine.',perform:'Pull elbows back, pause, and lower slowly.',cues:['No momentum','Control each rep'],mistakes:['Shrugging','Jerking']}),
+    ex('wed_pushup','Push-up','2×8-20',2,'wr',75,{muscles:['Chest','Triceps','Core'],setup:'Hands just wider than shoulders, body in a straight line.',perform:'Lower chest toward floor and press away.',cues:['Brace glutes and abs','Use full comfortable range'],mistakes:['Sagging hips','Flaring elbows excessively']}),
+    ex('wed_latraise','Cable Lateral Raise','2×12-15',2,'wr',60,{muscles:['Side Delts'],setup:'Stand beside a low cable with a slight elbow bend.',perform:'Raise to about shoulder height and lower slowly.',cues:['Light load, strict form','Lead with the elbow','Keep torso still'],mistakes:['Swinging','Shrugging heavily']}),
+    ex('wed_facepull','Face Pull','2×12-15',2,'wr',60,{muscles:['Rear Delts','Rotator Cuff','Upper Back'],setup:'Set cable at face height with rope attachment.',perform:'Pull rope toward face while separating hands.',cues:['Light load','Elbows high but comfortable'],mistakes:['Leaning back','Using momentum']})
   ]},
-  thu:{label:'Fri', title:'Pull (Hypertrophy)', exercises:[
-    ex('thu_widelatpull','Wide Grip Lat Pulldown','3×10-12',3,'wr',90,{
-      muscles:['Lats','Rear Delts','Biceps'],
-      setup:'Wide overhand grip, thighs locked under the pad.',
-      perform:'Pull the bar to your upper chest driving elbows down, then control it back to a full stretch.',
-      cues:['Lead with the elbows','Slight lean back only','Squeeze the lats at the bottom','Full stretch at the top'],
-      mistakes:['Pulling behind the neck','Excessive body swing','Grip too wide to control']}),
-    ex('thu_chestrow','Chest Supported Row','3×10-12',3,'wr',90,{
-      muscles:['Mid Back','Lats','Rear Delts'],
-      setup:'Chest against the pad, dumbbells or handles hanging.',
-      perform:'Row the weight toward your torso, squeezing the shoulder blades, then lower with control.',
-      cues:['Keep chest pinned to the pad','Drive elbows back, not out','Squeeze at the top','Control the negative'],
-      mistakes:['Lifting the chest off the pad','Using momentum','Shrugging the traps up']}),
-    ex('thu_facepull','Face Pull','3×15',3,'wr',60,{
-      muscles:['Rear Delts','Upper Back','Rotator Cuff'],
-      setup:'Rope at upper-chest to face height, slight step back.',
-      perform:'Pull the rope toward your face, splitting the ends apart, elbows high.',
-      cues:['Pull to eye level','Externally rotate at the end range','Keep elbows above shoulder height','Control the return'],
-      mistakes:['Pulling too low, turning it into a row','Using heavy weight with poor form','Rushing the tempo']}),
-    ex('thu_reardeltfly','Rear Delt Fly','3×15',3,'wr',60,{
-      muscles:['Rear Delts','Upper Back'],
-      setup:'Seated or bent over on a pec deck (reverse) / holding dumbbells hinged forward, slight bend in the elbows.',
-      perform:'Raise the arms out and back, squeezing the rear delts and shoulder blades together, then lower with control.',
-      cues:['Lead with the elbows, not the hands','Keep a slight bend in the elbows throughout','Squeeze shoulder blades at the top','Control the negative'],
-      mistakes:['Using momentum to swing the weight up','Turning it into a shrug','Using too much weight and shortening the range']}),
-    ex('thu_inclinecurl','Incline Dumbbell Curl','3×12',3,'wr',60,{
-      muscles:['Biceps'],
-      setup:'Seated on an incline bench, arms hanging straight down.',
-      perform:'Curl the dumbbells up without swinging the shoulders, then lower to a full stretch.',
-      cues:['Keep elbows pinned back against the bench','Full stretch at the bottom','Squeeze at the top','Avoid shoulder swing'],
-      mistakes:['Letting elbows drift forward','Using momentum','Partial range of motion']}),
-    ex('thu_hammercurl','Hammer Curl','2×12-15',2,'wr',60,{
-      muscles:['Biceps','Forearms'],
-      setup:'Stand tall, neutral (palms-in) grip on the dumbbells.',
-      perform:'Curl the dumbbells up keeping the neutral grip, squeeze, then lower fully.',
-      cues:['Keep wrists neutral throughout','Elbows stay at your sides','Squeeze at the top','Control the lowering phase'],
-      mistakes:['Swinging the torso','Letting elbows flare forward','Rushing the negative']}),
+  thu:{label:'Fri', title:'Conditioning + Mobility', exercises:[
+    ex('thu_boxing','Boxing / Bag Work','6×2 min',6,'time',60,{muscles:['Cardiovascular Fitness','Coordination'],setup:'Warm up first; use wraps and gloves for bag work.',perform:'Work at a moderate pace with controlled technique; rest about 1 minute between rounds.',cues:['Stay relaxed','Keep technique clean','Finish feeling you could do another round'],mistakes:['Going all-out every round','Training through wrist pain']}),
+    ex('thu_intervals','Short Intervals (alternative to boxing)','6×30 sec',6,'time',90,{muscles:['Cardiovascular Fitness','Power'],setup:'Use a bike, rower or sled. Warm up easily for 5 minutes first.',perform:'Work hard but controlled for 30 seconds, then recover 90 seconds at an easy pace. Log the work seconds for each round.',cues:['About 8/10 effort, not all-out','Keep form clean every round','Stop if power drops sharply'],mistakes:['Sprinting all-out from round 1','Stacking intervals on top of a long boxing session']}),
+    ex('thu_zone2','Easy Zone-2 Cardio','1×20-30 min',1,'time',0,{muscles:['Aerobic Base'],setup:'Choose brisk walking, easy cycling, or a relaxed jog.',perform:'Maintain a pace where you can speak in full sentences.',cues:['Easy and steady','Reduce duration if recovery is poor'],mistakes:['Turning every session into a race']}),
+    ex('thu_mobility','Full-Body Mobility','1×8-10 min',1,'time',0,{muscles:['Hips','Ankles','Thoracic Spine','Shoulders'],setup:'Choose gentle hip, ankle, upper-back and shoulder movements.',perform:'Move slowly through comfortable ranges without forcing stretches.',cues:['Breathe normally','Stay pain-free'],mistakes:['Bouncing aggressively','Forcing painful range']})
   ]},
-  fri:{label:'Sat', title:'Legs + Core (Hypertrophy)', exercises:[
-    ex('fri_frontsquat','Front Squat / Goblet Squat','3×10',3,'wr',150,{
-      muscles:['Quads','Glutes','Core'],
-      setup:'Bar racked on front delts (or dumbbell/kettlebell held at chest for goblet version).',
-      perform:'Squat down keeping the torso upright, then drive back up through the heels/mid-foot.',
-      cues:['Keep elbows high (front squat) or chest tall (goblet)','Torso stays upright throughout','Knees track over toes','Brace core before descending'],
-      mistakes:['Letting the torso fall forward','Elbows dropping (loses bar position)','Rushing the descent']}),
-    ex('fri_slrdl','Single-Leg DB RDL','3×10',3,'wr',90,{
-      muscles:['Hamstrings','Glutes','Core/Balance'],
-      setup:'Stand on one leg holding a dumbbell, slight knee bend.',
-      perform:'Hinge forward while the free leg extends back, lower the weight toward the floor, then return to standing.',
-      cues:['Keep hips square to the floor','Soft bend in the standing knee','Reach the free leg back for balance','Keep the weight close to the standing leg'],
-      mistakes:['Rotating the hips open','Rounding the back','Rushing and losing balance']}),
-    ex('fri_legext','Leg Extension','3×15',3,'wr',60,{
-      muscles:['Quads'],
-      setup:'Back against the pad, pad resting on the lower shins.',
-      perform:'Extend the legs until straight, squeeze, then lower with control.',
-      cues:['Squeeze quads hard at the top','Control the negative','Keep back against the pad','Avoid using momentum'],
-      mistakes:['Swinging the weight up','Not controlling the lowering phase','Locking knees out violently']}),
-    ex('fri_legcurl','Seated Leg Curl','3×15',3,'wr',60,{
-      muscles:['Hamstrings'],
-      setup:'Seated, pad resting on the lower calves/ankles.',
-      perform:'Curl the pad down and back, squeeze the hamstrings, then return with control.',
-      cues:['Squeeze at full flexion','Control the return','Keep hips pressed into the seat','Avoid partial reps'],
-      mistakes:['Using momentum','Only doing the top half of the range','Letting the weight drop']}),
-    ex('fri_calf','Seated Calf Raise','3×15-20',3,'wr',60,{
-      muscles:['Calves (Soleus)'],
-      setup:'Knees under the pad, balls of feet on the platform.',
-      perform:'Raise the heels as high as possible, pause, then lower to a full stretch.',
-      cues:['Full stretch at the bottom','Pause at the top','Slow, controlled tempo','Avoid bouncing'],
-      mistakes:['Using small, bouncy partial reps','Rushing the tempo','Not reaching a full stretch']}),
-    ex('fri_plank','Plank','3×60 sec',3,'time',45,{
-      muscles:['Core','Shoulders'],
-      setup:'Forearms and toes on the floor, body in a straight line.',
-      perform:'Hold a rigid, straight-line position while breathing normally.',
-      cues:['Squeeze glutes and brace the core','Keep hips level, not sagging or piked','Keep neck neutral, eyes down','Breathe steadily, don’t hold your breath'],
-      mistakes:['Letting the hips sag toward the floor','Piking the hips up too high','Holding your breath']}),
-    ex('fri_reversecrunch','Reverse Crunch','2×15',2,'wr',60,{
-      muscles:['Lower Abs'],
-      setup:'Lie on your back, knees bent, hands by your sides or under your hips.',
-      perform:'Curl the hips up off the floor by drawing the knees toward the chest, then lower with control.',
-      cues:['Lead with the pelvis, not the legs','Exhale as you curl up','Avoid using momentum','Control the lowering phase'],
-      mistakes:['Swinging the legs for momentum','Using the hip flexors instead of the abs','Not controlling the descent']}),
-  ]},
+  fri:{label:'Sat', title:'Athletic Full Body + Agility', exercises:[
+    ex('fri_jump','Low Box Jump','3×3',3,'wr',90,{muscles:['Power','Glutes','Quads'],setup:'Use a low, stable box with clear landing space.',perform:'Jump explosively, land softly, step down, and reset fully.',cues:['Every rep crisp','Stop if jump height or landing quality drops'],mistakes:['Jumping when fatigued','Jumping down from the box']}),
+    ex('fri_goblet','Goblet Squat','3×8-10',3,'wr',120,{muscles:['Quads','Glutes','Core'],setup:'Hold one dumbbell close to chest, feet stable.',perform:'Squat under control and stand tall.',cues:['Brace trunk','Knees track over toes'],mistakes:['Heels lifting','Rushing reps']}),
+    ex('fri_stepup','Weighted Step-up','3×8-10/leg',3,'wr',90,{muscles:['Quads','Glutes','Balance'],setup:'Use a knee-height bench or box. Hold a dumbbell in each hand or one at the chest. Log the total load.',perform:'Drive through the whole front foot, stand tall at the top, and lower under control. Finish all reps on one leg, then switch.',cues:['Do not push off the back foot','Control the way down','Keep torso tall'],mistakes:['Bouncing off the trail leg','Using a box so high the knee collapses inward']}),
+    ex('fri_slrdl','Single-Leg Dumbbell RDL','2×8-10/leg',2,'wr',90,{muscles:['Hamstrings','Glutes','Balance'],setup:'Hold a dumbbell in the opposite hand or use two light dumbbells.',perform:'Hinge at the hip while the free leg reaches back; return under control.',cues:['Keep hips square','Use a light load until balanced'],mistakes:['Rotating hips open','Rushing balance']}),
+    ex('fri_chin','Chin-up','2×4-7',2,'wr',120,{muscles:['Lats','Biceps'],setup:'Use a comfortable underhand grip.',perform:'Pull up without swinging and lower under control.',cues:['Keep reps clean','Stop before failure'],mistakes:['Kipping','Grinding every rep']}),
+    ex('fri_carry','Farmer Carry','3×30-40 m',3,'wr',75,{muscles:['Grip','Traps','Core'],setup:'Pick up dumbbells you can carry without leaning.',perform:'Walk with steady steps and a tall posture.',cues:['Brace trunk','Keep shoulders level'],mistakes:['Leaning','Rushing']}),
+    ex('fri_shuffle','Side Shuffle','4×10 m',4,'time',45,{muscles:['Agility','Coordination'],setup:'Mark a short 5 m lane each way on a non-slip surface.',perform:'Shuffle laterally with hips back and feet controlled, changing direction smoothly.',cues:['Stay light','Keep chest up','Build speed gradually'],mistakes:['Crossing feet','Slipping','Going all-out before warm-up']}),
+    ex('fri_crawl','Bear Crawl','3×10-15 m',3,'time',45,{muscles:['Core','Shoulders','Coordination'],setup:'Start on hands and feet with knees hovering just above the floor.',perform:'Move opposite hand and foot while keeping hips steady.',cues:['Short controlled steps','Keep back level'],mistakes:['Hips swaying','Rushing']}),
+    ex('fri_balance','Single-Leg Balance','2×30 sec/leg',2,'time',30,{muscles:['Ankles','Balance'],setup:'Stand near a wall or stable support.',perform:'Balance on one leg with a soft knee and level hips.',cues:['Barefoot only on safe surface','Use support as needed'],mistakes:['Pushing through ankle pain']})
+  ]}
 };
 
 /* ---------- Progression step per exercise (kg added when every set hits the top of the range) ----------
@@ -936,43 +781,40 @@ const PLAN = {
    isolation lifts step by 1 kg, upper compounds by 2–2.5 kg, and big lower-body lifts by 5 kg.
    Anything not listed falls back to 2.5 kg. */
 const INC = {
-  mon_bench:2.5, mon_row:2.5, mon_ohp:2, mon_latpull:2.5, mon_latraise:1, mon_curl:2, mon_tripush:1,
-  tue_squat:5, tue_rdl:5, tue_legpress:5, tue_legcurl:2.5, tue_calf:5, tue_hkr:1,
-  wed_incline:2, wed_machinechest:2.5, wed_dbshoulder:2, wed_latraise:1, wed_ropepush:1, wed_pecdeck:2.5,
-  thu_widelatpull:2.5, thu_chestrow:2.5, thu_facepull:1, thu_reardeltfly:1, thu_inclinecurl:1, thu_hammercurl:1,
-  fri_frontsquat:2.5, fri_slrdl:2, fri_legext:2.5, fri_legcurl:2.5, fri_calf:2.5, fri_reversecrunch:1
+  mon_bench:2.5, mon_pullup:1, mon_ohp:2, mon_chestrow:2.5, mon_carry:2, mon_latraise:1,
+  tue_squat:2.5, tue_rdl:2.5, tue_split:1, tue_legcurl:2.5, tue_calf:2.5, tue_core:1,
+  wed_incline:2, wed_dips:1, wed_pullup:1, wed_row:2.5, wed_pushup:1, wed_facepull:1, wed_latraise:1,
+  fri_goblet:2.5, fri_slrdl:1, fri_chin:1, fri_carry:2, fri_stepup:2
 };
 
-/* ---------- Build-specific warnings (narrow frame, small wrists, fast recovery limiter = food/sleep) ---------- */
+/* Bodyweight lifts: progress reps first (no load needed), then add a small load once every set hits the top. */
+const BODYWEIGHT = new Set(['mon_pullup','wed_pullup','wed_dips','wed_pushup','fri_chin']);
+/* No load suggestion for these (jump height / carries are not load-progressed like lifts). */
+const NO_SUGGEST = new Set(['fri_jump']);
+/* Excluded from the 'kg volume' totals because the number logged is not a lifted load. */
+const NON_LOAD_VOLUME = new Set(['fri_jump','mon_carry','fri_carry']);
+
 const BUILD = {
-  mon_bench:`Small wrists: keep them stacked over the forearms (wraps are fine). Elbows about 45–60° from the torso to spare the shoulders. Stop 1–2 reps short of failure — grinding a heavy bar is where narrow-framed lifters get shoulder injuries.`,
-  mon_row:`This is the one that stacks on your lower back: Tuesday's squat and RDL load the same muscles again within 24 h. Keep the torso rigid, use straps if grip is the limit, and swap to a chest-supported row if back fatigue carries into Tuesday.`,
-  mon_ohp:`Keep wrists neutral and don't lean back to finish reps — that turns shoulder work into lumbar stress. Shoulders take pressing again on Thursday, so leave 1–2 reps in reserve here.`,
-  mon_latraise:`Light and strict wins. Going heavy just recruits the traps. Step up by 1 kg at a time.`,
-  mon_curl:`If a straight bar bothers your wrists or elbows, use an EZ-bar. Elbows stay pinned.`,
-  mon_tripush:`Elbow tendons already absorb pressing all week. Stop the set at any pinch on the inner or back of the elbow.`,
-  tue_squat:`Heaviest spinal load of the week on a narrower frame. Warm up properly, brace hard, use safety pins, and end the set when bar speed collapses or form slips — not at failure. Eat carbs before this session.`,
-  tue_rdl:`Highest lower-back risk in the plan. End the set when your back position changes, not when you can't lift it. Straps recommended so grip doesn't cut your sets short.`,
-  tue_legpress:`Don't let your hips curl off the pad at the bottom — that's lumbar flexion under load. Shorten the range if it happens.`,
-  tue_hkr:`If hanging irritates your shoulders, use a captain's chair or straps. No swinging.`,
-  wed_incline:`After Monday's bench and press, this is the third chest/shoulder/triceps hit inside 72 h. Leave 1–2 reps in reserve and set dumbbells down safely — don't kick them up with a narrow-frame shoulder.`,
-  wed_dbshoulder:`Shoulders were pressed heavy on Monday. If you feel a pinch at the front of the shoulder, drop one set or move to a neutral-grip press.`,
-  wed_latraise:`Highest weekly delt frequency lives here. Keep it strict; stop at the first sign of shoulder pinching.`,
-  wed_ropepush:`Elbow tendons again — keep the elbows still and stop before they start to ache.`,
-  thu_facepull:`This is shoulder-health work for a week full of pressing. Go light and slow, focus on external rotation.`,
-  thu_reardeltfly:`Small muscle, small weight. If you need momentum, the weight is too heavy.`,
-  fri_frontsquat:`The front rack needs wrist and shoulder mobility. If your small wrists complain, use the goblet version or straps instead of forcing the rack position. Keep this lighter than Tuesday.`,
-  fri_slrdl:`Keep it moderate — balance and the lower back both limit this lift, and it follows Tuesday's heavy RDL by four days.`,
-  fri_legext:`No violent lockouts at the top. Control the weight through the whole range.`,
-  fri_plank:`Stop the set when the hips sag. A short clean hold beats a long sloppy one.`
+  mon_bench:'Use a spotter or rack safeties. Stop 1–2 reps before failure.',
+  mon_pullup:'Your current strict maximum is 4–7 reps. Start with clean sets of 3–5; use assistance if needed. When all sets reach 7 clean reps, add a small load or slow the lowering phase.',
+  mon_carry:'Progress distance first, then load. Stay tall and avoid leaning.',
+  tue_squat:'Keep 1–2 reps in reserve and use rack safeties. Add load only after every set reaches the top of the range with stable technique.',
+  tue_rdl:'Keep the bar close and stop the set if spinal position changes.',
+  wed_dips:'Your current strict maximum is 6–10 reps. Start with 4–7 controlled reps per set, not max-effort sets. Add load only once all sets reach 9 clean reps.',
+  wed_pullup:'Keep 1–2 reps in reserve. Assistance is better than kipping.',
+  fri_jump:'Power work is quality-first, not conditioning. Log box height in cm in the weight field. Progress by cleaner landings or a slightly higher box, never by fatigue.',
+  fri_stepup:'Single-leg strength for the athletic look. Log the total dumbbell load. Progress reps first, then add the smallest load.',
+  wed_latraise:'Light and strict. Side delts add shoulder shape without much fatigue. Stop at any pinch in the shoulder.',
+  thu_intervals:'Pick boxing or intervals as your hard session today. Easy zone-2 is the optional extra. Do not make both hard.',
+  fri_shuffle:'Warm up before changing direction quickly. Build speed over several sessions.'
 };
 
 const DAY_NOTES = {
-  mon:`<b>Heavy day.</b> Compounds: stop 1–2 reps short of failure; only the isolation sets can go to failure. Warm up with 2–3 ramp-up sets on bench. The barbell row loads your lower back the day before squats and RDLs — if you're still sore on Tuesday, swap it for a chest-supported row.`,
-  tue:`<b>Heaviest spinal day.</b> Warm up properly, brace hard, use pins in the rack. Skip the last rep of any set where form slips, especially on the RDL. Have carbs before this session — heavy legs on low fuel is where narrow-framed lifters run out of gas.`,
-  wed:`<b>Hypertrophy day after a rest day.</b> Presses can sit 1–2 reps from failure; isolation can go to failure. Chest, shoulders and triceps were worked heavy on Monday — if elbows or front delts ache, drop one set from the presses and keep lateral raises light and strict.`,
-  thu:`<b>Back and arms.</b> Straps are fine if grip fails before your back does. Don't chase weight on face pulls and rear delts. Biceps already get indirect volume from every row and pulldown — resist the urge to add curls.`,
-  fri:`<b>Second leg day.</b> Keep it lighter than Tuesday — the goal is muscle, not a second max effort. Watch the lower back on single-leg RDLs and the knees on leg extensions. Core is done here; more ab work adds fatigue without much return.`
+  mon:'<b>Strength A.</b> Keep compound lifts at 1–2 reps in reserve. Double progression: add reps within the range, then add the smallest practical load when every set reaches the top cleanly. Carries should challenge posture, not wreck it.',
+  tue:'<b>Lower strength.</b> Squat first, RDL second. No grinders. Hip and ankle mobility is easy practice, not a painful stretch session.',
+  wed:'<b>Upper calisthenics.</b> Lateral raises are light and strict. With 4–7 strict pull-ups and 6–10 strict dips, avoid maxing out. Keep 1–2 good reps in reserve; use assisted variations if needed to stay in the target range.',
+  thu:'<b>Conditioning day.</b> Choose boxing or short intervals as the hard session; easy zone-2 is optional. Keep boxing moderate, not a war. Zone-2 should let you speak in full sentences. If you are unusually sore or sleep-deprived, shorten the session.',
+  fri:'<b>Athletic session.</b> Do jumps and agility while fresh, then strength work, then carries/crawls/balance. Stop jumps if landings get loud or sloppy. This session should leave you capable, not destroyed. If time runs short, drop chin-ups and balance work before jumps or step-ups.'
 };
 
 const REST_DAYS = [0,3]; // Sunday, Wednesday
@@ -1006,8 +848,8 @@ function daysBetween(a,b){
   return Math.round((Date.parse(b+'T00:00:00Z') - Date.parse(a+'T00:00:00Z'))/86400000);
 }
 function defaultDayFromWeekday(){
-  // Wed is a rest day, so it opens Thursday's workout (the next one up); Sun opens Monday.
-  const map = {1:'mon',2:'tue',3:'wed',4:'wed',5:'thu',6:'fri'};
+  // Wednesday and Sunday are recovery days; show the next planned session.
+  const map = {1:'mon',2:'tue',3:'wed',4:'wed',5:'thu',6:'fri'}; // internal keys: wed=Thu workout, thu=Fri, fri=Sat
   return map[new Date().getDay()] || 'mon';
 }
 currentDay = defaultDayFromWeekday();
@@ -1116,6 +958,36 @@ async function logBodyweight(){
   renderRecovery();
 }
 
+/* ---------- Waist log ---------- */
+async function renderWaist(){
+  const log = (await safeGet('waist_log')) || [];
+  const stat = document.getElementById('waistStat');
+  if(!log.length){ stat.textContent = ''; return; }
+  const last = log[log.length-1];
+  let trendHtml = '';
+  if(log.length>1){
+    const prev = log[log.length-2];
+    const diff = last.waist - prev.waist;
+    const cls = diff<0 ? 'trend-down' : (diff>0 ? 'trend-up' : '');
+    const arrow = diff<0 ? '↓' : (diff>0 ? '↑' : '→');
+    trendHtml = ` <span class="${cls}">${arrow} ${Math.abs(diff).toFixed(1)}</span>`;
+  }
+  stat.innerHTML = `<b>${last.waist}cm</b>${trendHtml}`;
+}
+async function logWaist(){
+  const input = document.getElementById('waistInput');
+  const val = input.value;
+  if(val === '') return;
+  const log = (await safeGet('waist_log')) || [];
+  const filtered = log.filter(e=>e.date !== currentDate);
+  filtered.push({date: currentDate, waist: Number(val)});
+  filtered.sort((a,b)=>a.date.localeCompare(b.date));
+  await safeSet('waist_log', filtered.slice(-90));
+  input.value = '';
+  renderWaist();
+  renderRecovery();
+}
+
 /* ---------- Consistency heatmap ---------- */
 async function renderHeatmap(){
   const trained = new Set((await safeGet('trained_dates')) || []);
@@ -1164,7 +1036,7 @@ async function renderRecovery(){
   if(dl.active){
     items.push({lvl:'info', html:`<b>Deload week, day ${dl.since+1} of 7.</b> Do about half the usual sets, keep weights the same or drop them 10%, and stop 3+ reps short of failure. Sleep and eat as normal.`});
   } else if(weeksOn>=7){
-    items.push({lvl:'alert', html:`<b>${weeksOn} weeks without a deload.</b> At this volume (about 95 hard sets a week) you should deload every 5–6 weeks. Take one now, even if you feel fine — fatigue hides behind motivation.`});
+    items.push({lvl:'alert', html:`<b>${weeksOn} weeks without a deload.</b> With this hybrid schedule, consider an easier week every 5–7 weeks or sooner if recovery drops. Take one now, even if you feel fine — fatigue hides behind motivation.`});
   } else if(weeksOn>=5){
     items.push({lvl:'warn', html:`<b>Week ${weeksOn+1} since your last deload.</b> A deload is due this week or next.`});
   }
@@ -1176,12 +1048,12 @@ async function renderRecovery(){
   }
 
   if(last7>=6){
-    items.push({lvl:'alert', html:`<b>${last7} sessions in the last 7 days.</b> The plan is 5 — more than that means recovery is being spent, not built.`});
+    items.push({lvl:'alert', html:`<b>${last7} sessions in the last 7 days.</b> The planned week has four strength/athletic sessions and one conditioning session; extra hard sessions may compromise recovery.`});
   }
 
   const dow = new Date().getDay();
   if(REST_DAYS.includes(dow) && !trained.has(today)){
-    items.push({lvl:'info', html:`<b>Planned rest day.</b> A walk, mobility work and a proper meal are the job today. Keep boxing/cardio easy or skip it.`});
+    items.push({lvl:'info', html:`<b>Planned rest day.</b> Optional: a 20–30 minute easy walk or cycle, some mobility work and a proper meal. Keep it easy; no hard boxing or intervals today.`});
   }
 
   // Body-weight trend over the last 3 weeks
@@ -1192,10 +1064,25 @@ async function renderRecovery(){
     const span = daysBetween(first.date, last.date);
     if(span>=10){
       const rate = (last.weight - first.weight)/(span/7);
-      if(rate>0.5){
-        items.push({lvl:'warn', html:`<b>Gaining about ${rate.toFixed(2)} kg/week.</b> On your build a pace above ~0.3–0.5 kg/week is mostly fat. Trim 150–200 kcal a day rather than training more.`});
+      if(rate>0.3){
+        items.push({lvl:'warn', html:`<b>Gaining about ${rate.toFixed(2)} kg/week.</b> Faster than needed for this goal. If it continues past the first 2–3 weeks at maintenance, cut 150–200 kcal/day instead of adding training.`});
       } else if(rate<-0.4){
-        items.push({lvl:'warn', html:`<b>Losing about ${Math.abs(rate).toFixed(2)} kg/week while training 5 days.</b> That usually means you're under-eating for this volume. Expect stalled lifts and slower recovery — add 200–300 kcal, carbs around training first.`});
+        items.push({lvl:'warn', html:`<b>Losing about ${Math.abs(rate).toFixed(2)} kg/week.</b> Faster than the 0.25–0.5 kg/week target. If lifts are stalling or recovery is poor, add 150–250 kcal, carbs around training first.`});
+      }
+    }
+  }
+
+  // Waist trend over the last 4 weeks (needs at least 2 weeks of data)
+  const wl = (await safeGet('waist_log')) || [];
+  const wrecent = wl.filter(e=>{ const d = daysBetween(e.date, today); return d>=0 && d<=28; });
+  if(wrecent.length>=2){
+    const wf = wrecent[0], wlast = wrecent[wrecent.length-1];
+    if(daysBetween(wf.date, wlast.date)>=14){
+      const dc = wlast.waist - wf.waist;
+      if(dc>=1){
+        items.push({lvl:'warn', html:`<b>Waist up ${dc.toFixed(1)} cm over the last few weeks.</b> If weight is also rising, trim 150–200 kcal/day. Keep protein around 1.8–2.2 g/kg.`});
+      } else if(dc<=-1){
+        items.push({lvl:'ok', html:`<b>Waist down ${Math.abs(dc).toFixed(1)} cm.</b> Trend is right. Keep strength numbers steady while it moves.`});
       }
     }
   }
@@ -1223,35 +1110,38 @@ document.getElementById('deloadBtn').onclick = async ()=>{
 function openGuideModal(){
   document.getElementById('guideModalBody').innerHTML = `
     <div class="info-section">
-      <div class="info-label">About body-type labels</div>
-      <div class="info-text">“Ecto/meso hybrid” is a rough description, not a hard category. What it points to in practice: a narrower frame gives joints and tendons less to work with under heavy load, and a fast metabolism means recovery is limited more by food and sleep than by the program. Trust your own logs over the label.</div>
+      <div class="info-label">Goal: athletic, not maximal size</div>
+      <div class="info-text">This plan prioritizes strength, movement quality, power, conditioning and recovery while keeping enough progressive resistance training to maintain and build useful muscle. Lifting does not automatically make you bulky; large muscle gain usually takes sustained training, time and a calorie surplus.</div>
     </div>
     <div class="info-section">
-      <div class="info-label">Recovery limiters</div>
+      <div class="info-label">Weekly structure</div>
       <ul class="bullet-list">
-        <li>Eat a small surplus — about 200–300 kcal over maintenance with 1.6–2.2 g/kg protein. A bigger surplus mostly becomes fat on your build.</li>
-        <li>Don't run very low carbs on Monday, Tuesday and Saturday. Heavy compound days need glycogen.</li>
-        <li>Sleep 7–9 hours. Short sleep costs more than a skipped session.</li>
-        <li>Wednesday and Sunday are rest days. Don't turn them into hard cardio or extra lifting.</li>
-        <li>Boxing or cardio: 1–2 easy-to-moderate sessions a week, away from the day before Tuesday and Saturday leg days.</li>
+        <li>Monday: upper strength and farmer carries.</li>
+        <li>Tuesday: squat, RDL, single-leg work, core and hip/ankle mobility.</li>
+        <li>Wednesday: rest, with an optional 20–30 minute easy walk or cycle.</li>
+        <li>Thursday: upper-body calisthenics, controlled pressing/pulling and light lateral raises.</li>
+        <li>Friday: boxing or short intervals (pick one hard option), optional easy aerobic work and mobility.</li>
+        <li>Saturday: low-volume power, goblet squats, weighted step-ups, single-leg work, agility, carries and crawling.</li>
+        <li>Sunday: rest.</li>
       </ul>
     </div>
     <div class="info-section">
-      <div class="info-label">Load management</div>
+      <div class="info-label">Progression</div>
       <ul class="bullet-list">
-        <li>Leave 1–2 reps in reserve on compounds. Only isolation sets go to failure.</li>
-        <li>Deload every 5–6 weeks (button in Recovery Check). Around 95 hard sets a week is already near the upper end.</li>
-        <li>If a lift stalls, check food and sleep first, then technique. Adding sets is the last thing to try.</li>
-        <li>Progression steps are now per lift: 1 kg on lateral raises, curls and pushdowns, 2–2.5 kg on upper compounds, 5 kg on squat, RDL and leg press. Override any suggestion by typing your own weight.</li>
-        <li>Lower-back stacking: Monday row, Tuesday squat and RDL, Saturday front squat and single-leg RDL. If the back is fatigued going into Tuesday, swap the row.</li>
+        <li>Use double progression: add reps within the range first; when all sets reach the top with clean technique, add the smallest practical load.</li>
+        <li>Keep 1–2 reps in reserve on most strength sets. Do not test your maximum every workout.</li>
+        <li>For pull-ups, start around 3–5 reps per set. For dips, start around 4–7 reps per set. Adjust with assistance if needed to keep reps controlled.</li>
+        <li>For jumps and agility, prioritize crisp technique and full recovery over fatigue. Stop if landings or movement quality deteriorate.</li>
+        <li>Deload when performance drops across sessions or fatigue accumulates; a planned easier week every 5–7 weeks is a useful starting point, not a law.</li>
       </ul>
     </div>
     <div class="info-section">
-      <div class="info-label">Stop signs</div>
-      <ul class="bullet-list mistake-list">
-        <li>Sharp, pinching or joint-line pain (elbow, shoulder, wrist, knee): stop that exercise for the day and swap or drop it.</li>
-        <li>Pain that lasts beyond 48 h or gets worse week to week, numbness or tingling, or pain running down an arm or leg: stop that lift and get it assessed.</li>
-        <li>Weights falling for two sessions in a row, poor sleep and constant fatigue: start the deload early.</li>
+      <div class="info-label">Recovery and nutrition</div>
+      <ul class="bullet-list">
+        <li>Stay around maintenance calories for the first 2–3 weeks. Log waist and body weight. If your waist is up 1 cm or more, or weight is rising faster than 0.3 kg/week, cut 150–200 kcal/day. Aim for no more than 0.25–0.5 kg/week of loss.</li>
+        <li>Aim for roughly 1.6–2.2 g protein per kg body weight per day, adequate carbohydrates around training, and 7–9 hours of sleep.</li>
+        <li>Keep Wednesday and Sunday genuinely easy. Optional walks are fine; do not turn recovery days into extra hard workouts.</li>
+        <li>Stop an exercise for sharp or increasing joint pain. Seek assessment for persistent pain, numbness or tingling.</li>
       </ul>
     </div>`;
   document.getElementById('guideModal').classList.add('open');
@@ -1298,13 +1188,33 @@ function parseTarget(target){
    session — never mid-session, never automatically every session.
    The size of the jump is per exercise (see INC). */
 function computeSuggestion(exObj, lastEntry){
-  if(!lastEntry || exObj.type!=='wr') return null;
+  if(!lastEntry || exObj.type!=='wr' || NO_SUGGEST.has(exObj.id)) return null;
   const {min,max} = parseTarget(exObj.target);
   if(min===null) return null;
   const validSets = lastEntry.sets.filter(s=>s.w!==undefined && s.r!==undefined);
   if(!validSets.length) return null;
   const topWeight = Math.max(...validSets.map(s=>s.w||0));
-  if(topWeight===0) return null;
+  if(topWeight===0){
+    if(!BODYWEIGHT.has(exObj.id)) return null;
+    const bwReps = validSets.map(s=>s.r||0);
+    const bwStr = bwReps.join(',');
+    const bwTotal = bwReps.reduce((a,b)=>a+b,0);
+    const bwTop = bwReps.length>=exObj.sets && bwReps.every(r=>r>=max);
+    if(bwTop){
+      const inc = INC[exObj.id] !== undefined ? INC[exObj.id] : 1;
+      return {suggestedWeight: undefined, increase:true, lines:[
+        `Add load: start with +${inc} kg (belt or dumbbell) or a harder variation`,
+        `Previous: ${bwStr}`,
+        `You reached the top of the rep range on every set.`
+      ]};
+    }
+    return {suggestedWeight: undefined, increase:false, lines:[
+      `Bodyweight: add reps first`,
+      `Previous: ${bwStr}`,
+      `Goal: ${Array(exObj.sets).fill(max).join(',')}`,
+      `Next target: beat ${bwTotal} total reps`
+    ]};
+  }
 
   const reps = validSets.map(s=>s.r||0);
   const repsStr = reps.join(',');
@@ -1365,6 +1275,12 @@ function detectPRs(hist, todayEntry, type){
   }
   const todayMaxW = Math.max(0,...todayEntry.sets.map(s=>s.w||0));
   const priorMaxW = prior.length ? Math.max(0,...prior.flatMap(h=>h.sets.map(s=>s.w||0))) : 0;
+  if(todayMaxW===0){
+    const todayMaxR = Math.max(0,...todayEntry.sets.map(s=>s.r||0));
+    const priorMaxR = prior.length ? Math.max(0,...prior.flatMap(h=>h.sets.map(s=>s.r||0))) : 0;
+    if(todayMaxR>0 && todayMaxR>priorMaxR) prs.push('Rep PR');
+    return prs;
+  }
   if(todayMaxW>0 && todayMaxW>priorMaxW) prs.push('Weight PR');
   const today1RM = compute1RM(todayEntry) || 0;
   const prior1RM = prior.length ? Math.max(0,...prior.map(h=>compute1RM(h)||0)) : 0;
@@ -1562,6 +1478,7 @@ async function renderDay(){
         </div>
         ${buildNote ? `<div class="ex-build"><b>For your build:</b> ${buildNote}</div>` : ''}
         ${suggestion ? `<div class="ex-suggestion"><b style="color:${suggestion.increase?'var(--accent)':'var(--text)'}">${suggestion.lines[0]}</b><br>${suggestion.lines.slice(1).join('<br>')}</div>` : ''}
+        ${exObj.type==='time' ? '<div class="ex-build">Log each set in seconds (1500 = 25 min). For distance drills, log how long the set took.</div>' : ''}
         <div class="sets-grid"></div>
         <button type="button" class="add-set-btn">+ add set</button>
         ${(volume>0 || oneRM) ? `<div class="ex-metrics">
@@ -1746,7 +1663,7 @@ async function saveSession(){
     savedCount++;
     if(sets.length){
       anySaved = true;
-      if(type!=='time') totalVolume += computeVolume(todayEntry);
+      if(type!=='time' && !NON_LOAD_VOLUME.has(exId)) totalVolume += computeVolume(todayEntry);
     }
   }
 
@@ -1833,6 +1750,11 @@ async function exportCSV(){
   rows.push(['bodyweight_log']);
   rows.push(['date','weight_kg']);
   bwLog.forEach(e=>rows.push([e.date, e.weight]));
+  const waistLog = (await safeGet('waist_log')) || [];
+  rows.push([]);
+  rows.push(['waist_log']);
+  rows.push(['date','waist_cm']);
+  waistLog.forEach(e=>rows.push([e.date, e.waist]));
 
   const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
@@ -1853,11 +1775,13 @@ document.getElementById('logDate').addEventListener('change', (e)=>{
 });
 document.getElementById('saveBtn').addEventListener('click', saveSession);
 document.getElementById('bwLogBtn').addEventListener('click', logBodyweight);
+document.getElementById('waistLogBtn').addEventListener('click', logWaist);
 document.getElementById('exportBtn').addEventListener('click', exportCSV);
 
 renderTabs();
 renderDay();
 renderBodyweight();
+renderWaist();
 renderHeatmap();
 renderRecovery();
 </script>
